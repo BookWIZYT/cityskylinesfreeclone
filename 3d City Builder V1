@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D City Builder</title>
+    <!-- We now use our own stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Three.js Library -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- 3D Scene Container -->
+    <div id="container"></div>
+
+    <!-- UI Elements -->
+    
+    <!-- Top-Left Vitals -->
+    <div class="ui-panel" id="vitals-panel">
+        <h2 class="panel-title">City Vitals</h2>
+        <div class="panel-content">
+            <p><strong>Money:</strong> $<span id="money-display">100000</span></p>
+            <p><strong>Population:</strong> <span id="population-display">0</span></p>
+            <p><strong>Date:</strong> <span id="date-display">Jan, Year 1</span></p>
+        </div>
+    </div>
+
+    <!-- Top-Right Save/Load (Stubbed) -->
+    <div class="ui-panel" id="save-load-panel">
+        <button id="save-button" class="ui-button">Save City</button>
+        <button id="load-button" class="ui-button">Load City</button>
+        <button id="new-game-button" class="ui-button red">New Game</button>
+    </div>
+
+    <!-- Bottom Toolbar -->
+    <div class="ui-panel" id="toolbar">
+        <!-- Main Tools -->
+        <button id="tool-select" class="tool-btn tool-active" data-tool="select" title="Select (ESC)">
+            <img src="https://placehold.co/24x24/ffffff/222222?text=S" alt="Select">
+        </button>
+        <button id="tool-bulldoze" class="tool-btn" data-tool="bulldoze" title="Bulldoze">
+             <img src="https://placehold.co/24x24/ff0000/ffffff?text=X" alt="Bulldoze">
+        </button>
+        
+        <div class="divider"></div>
+
+        <!-- Zoning Tools -->
+        <button id="tool-residential" class="tool-btn" data-tool="residential" title="Residential Zone">
+            <img src="https://placehold.co/24x24/00cc00/ffffff?text=R" alt="Residential">
+        </button>
+        <button id="tool-commercial" class="tool-btn" data-tool="commercial" title="Commercial Zone">
+            <img src="https://placehold.co/24x24/0000cc/ffffff?text=C" alt="Commercial">
+        </button>
+        <button id="tool-industrial" class="tool-btn" data-tool="industrial" title="Industrial Zone">
+             <img src="https://placehold.co/24x24/cccc00/ffffff?text=I" alt="Industrial">
+        </button>
+
+        <div class="divider"></div>
+
+        <!-- Infrastructure Tools -->
+        <button id="tool-road" class="tool-btn" data-tool="road" title="Road">
+            <img src="https://placehold.co/24x24/444444/ffffff?text=RD" alt="Road">
+        </button>
+        <button id="tool-power" class="tool-btn" data-tool="power" title="Power Lines (Soon)">
+             <img src="https://placehold.co/24x24/888888/ffffff?text=P" alt="Power">
+        </button>
+        <button id="tool-water" class="tool-btn" data-tool="water" title="Water Pipes (Soon)">
+             <img src="https://placehold.co/24x24/888888/ffffff?text=W" alt="Water">
+        </button>
+
+        <div class="divider"></div>
+
+        <!-- City Services (Stubbed) -->
+        <button id="tool-services" class="tool-btn" data-tool="services" title="Services (Soon)">
+            <img src="https://placehold.co/24x24/888888/ffffff?text=SV" alt="Services">
+        </button>
+        <button id="tool-disasters" class="tool-btn" data-tool="disasters" title="Disasters (Soon)">
+            <img src="https://placehold.co/24x24/888888/ffffff?text=D" alt="Disasters">
+        </button>
+        <button id="tool-education" class="tool-btn" data-tool="education" title="Education (Soon)">
+            <img src="https://placehold.co/24x24/888888/ffffff?text=E" alt="Education">
+        </button>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="message-modal" class="hidden">
+        <p id="message-text"></p>
+    </div>
+
+    <!-- Main Game Engine Script -->
+    <script type="module" src="./scripts/engine.js"></script>
+
+</body>
+</html>
