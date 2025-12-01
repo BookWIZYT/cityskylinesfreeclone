@@ -1,0 +1,10 @@
+{
+    "mapName": "Twin Peaks",
+    "seed": 123456,
+    "startMoney": 100000,
+    "terrain": {
+        "baseHeight": 0,
+        "peakHeight": 60,
+        "noiseScale": 0.01
+    }
+}
