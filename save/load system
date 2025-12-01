@@ -1,0 +1,40 @@
+/**
+ * Storage.js
+ * STUB FILE
+ * This will handle saving and loading the *entire* game state
+ * (simulation, meshes, etc.) to/from LocalStorage.
+ */
+
+export function init() {
+    console.log("Initializing Storage System (STUB)...");
+}
+
+/**
+ * Serializes the entire game state to a JSON string.
+ */
+export function saveGame() {
+    console.warn("Storage.saveGame() not implemented.");
+    // This will need to get data from Simulation.js
+    // and serialize gameState.objects (which is a Map)
+    // const serializableState = { ... };
+    // localStorage.setItem('cityBuilderSave', JSON.stringify(serializableState));
+}
+
+/**
+ * Parses the saved JSON and rebuilds the city.
+ */
+export function loadGame() {
+    console.warn("Storage.loadGame() not implemented.");
+    // This will be complex. It needs to:
+    // 1. Clear the current city (call Simulation.clear() and Render.clear())
+    // 2. Parse the JSON.
+    // 3. Loop through saved objects and call Simulation.placeObject()
+    // 4. ...and also Render.createRoadMesh()/createZoneMesh() for each.
+    // 5. Restore money, pop, etc.
+}
+
+export function newGame() {
+    console.warn("Storage.newGame() not implemented.");
+    // This should reload the page or call a full
+    // engine.reset() function.
+}
