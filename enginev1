@@ -1,0 +1,173 @@
+import * as Render from './render.js';
+import * as Simulation from './simulation.js';
+import * as UI from './ui.js';
+import * as Traffic from './traffic.js';
+import * as Disasters from './disasters.js';
+import * as Education from './education.js';
+import * as Storage from './storage.js';
+
+/**
+ * Engine.js
+ * The main coordinator of the game. It initializes all subsystems
+ * and runs the main game loop.
+ */
+
+class GameEngine {
+    constructor() {
+        this.lastTimestamp = 0;
+    }
+
+    /**
+     * Initializes all game subsystems.
+     */
+    init() {
+        console.log("Initializing Game Engine...");
+
+        // Initialize all subsystems
+        Simulation.init();
+        Render.init(this); // Pass engine reference to renderer
+        UI.init(this);       // Pass engine reference to UI
+        Traffic.init();
+        Disasters.init();
+        Education.init();
+        Storage.init();
+
+        // Start the game loop
+        this.animate(0);
+    }
+
+    /**
+     * The main game loop, called every frame.
+     */
+    animate(timestamp) {
+        requestAnimationFrame((t) => this.animate(t));
+
+        const deltaTime = (timestamp - this.lastTimestamp) / 1000;
+        if (isNaN(deltaTime) || deltaTime > 1) {
+            // Handle timestamp issues (e.g., tabbed out)
+            this.lastTimestamp = timestamp;
+            return;
+        }
+
+        // Update subsystems
+        Simulation.tick(deltaTime);
+        Render.animate(deltaTime);
+        UI.update(deltaTime); // For any UI animations
+
+        this.lastTimestamp = timestamp;
+    }
+
+    // --- Public API for UI/Subsystems to call ---
+
+    /**
+     * Handles a user click on the game world.
+     * @param {THREE.Vector3} point - The 3D point of intersection.
+     */
+    onWorldClick(point) {
+        const currentTool = UI.getCurrentTool();
+        const gridPos = Simulation.getGridPosition(point);
+
+        if (!gridPos) return;
+
+        switch (currentTool) {
+            case 'road':
+                this.placeRoad(gridPos);
+                break;
+            case 'residential':
+            case 'commercial':
+            case 'industrial':
+                this.placeZone(gridPos, currentTool);
+                break;
+            case 'bulldoze':
+                this.bulldoze(gridPos);
+                break;
+            case 'select':
+                this.selectObject(gridPos);
+                break;
+        }
+    }
+
+    /**
+     * Handles user mouse movement over the game world.
+     * @param {THREE.Vector3} point - The 3D point of intersection.
+     */
+    onWorldMove(point) {
+        const gridPos = Simulation.getGridPosition(point);
+        const currentTool = UI.getCurrentTool();
+        
+        if (currentTool !== 'select' && gridPos) {
+            const height = Render.getTerrainHeight(gridPos.x, gridPos.z);
+            const key = Simulation.getKey(gridPos);
+            const isOccupied = Simulation.isOccupied(key);
+            Render.updateBuildCursor(gridPos, height, isOccupied);
+        } else {
+            Render.hideBuildCursor();
+        }
+    }
+
+    placeRoad(pos) {
+        const cost = Simulation.getCost('road');
+        if (Simulation.canAfford(cost)) {
+            const height = Render.getTerrainHeight(pos.x, pos.z);
+            const success = Simulation.placeObject(pos, 'road', cost);
+            if (success) {
+                Render.createRoadMesh(pos, height);
+                UI.updateVitals();
+            } else {
+                UI.showMessage("Cannot build road here!");
+            }
+        } else {
+            UI.showMessage("Not enough money!");
+        }
+    }
+
+    placeZone(pos, type) {
+        const cost = Simulation.getCost(type);
+        if (Simulation.canAfford(cost)) {
+            const height = Render.getTerrainHeight(pos.x, pos.z);
+            const success = Simulation.placeObject(pos, type, cost);
+            if (success) {
+                Render.createZoneMesh(pos, type, height);
+                UI.updateVitals();
+            } else {
+                UI.showMessage("Cannot build zone here!");
+            }
+        } else {
+            UI.showMessage("Not enough money!");
+        }
+    }
+
+    bulldoze(pos) {
+        const cost = Simulation.getCost('bulldoze');
+        if (Simulation.canAfford(cost)) {
+            const objectToBulldoze = Simulation.getObjectAt(pos);
+            if (objectToBulldoze) {
+                Simulation.removeObject(pos, cost);
+                Render.removeMesh(objectToBulldoze);
+                UI.updateVitals();
+            }
+        } else {
+            UI.showMessage("Not enough money to bulldoze!");
+        }
+    }
+
+    selectObject(pos) {
+        const object = Simulation.getObjectAt(pos);
+        if (object) {
+            console.log("Selected:", object);
+            UI.showMessage(`Selected: ${object.type} at ${object.x}, ${object.z}`);
+            // Future: Show an info panel for this object
+        }
+    }
+    
+    // --- Getters for other systems ---
+    getGameState() {
+        return Simulation.getGameState();
+    }
+}
+
+// Start the game
+window.addEventListener('DOMContentLoaded', () => {
+    const game = new GameEngine();
+    game.init();
+});
