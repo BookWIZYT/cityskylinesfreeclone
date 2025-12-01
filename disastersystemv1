@@ -1,0 +1,25 @@
+/**
+ * Disasters.js
+ * STUB FILE
+ * This will manage random events, triggering disasters,
+ * and applying damage to the city.
+ */
+
+export function init() {
+    console.log("Initializing Disaster System (STUB)...");
+}
+
+/**
+ * Triggers a specific disaster.
+ * @param {string} type - e.g., 'earthquake', 'meteor', 'fire'
+ */
+export function triggerDisaster(type) {
+    console.warn(`Traffic.triggerDisaster(${type}) not implemented.`);
+}
+
+/**
+ * Runs a check for random disaster events.
+ */
+export function update(deltaTime) {
+    // Logic to randomly start a disaster
+}
