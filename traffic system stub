@@ -1,0 +1,26 @@
+/**
+ * Traffic.js
+ * STUB FILE
+ * This will handle all traffic simulation, pathfinding (A*),
+ * and agent (car/citizen) movement.
+ */
+
+export function init() {
+    console.log("Initializing Traffic System (STUB)...");
+}
+
+/**
+ * Finds a path from start {x,z} to end {x,z} using the road network.
+ * @returns {Array} An array of {x,z} waypoints, or null if no path.
+ */
+export function findPath(start, end) {
+    console.warn("Traffic.findPath() not implemented.");
+    return null;
+}
+
+/**
+ * Spawns a vehicle agent.
+ */
+export function spawnVehicle() {
+    console.warn("Traffic.spawnVehicle() not implemented.");
+}
