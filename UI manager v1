@@ -1,0 +1,100 @@
+import * as Simulation from './simulation.js';
+
+/**
+ * UI.js
+ * Handles all DOM interaction, event listeners, and UI updates.
+ */
+
+let engine; // Reference to the main game engine
+let currentTool = 'select';
+
+// DOM element cache
+let moneyDisplay, popDisplay, dateDisplay;
+let toolButtons;
+let messageModal, messageText;
+let messageTimer;
+
+export function init(gameEngine) {
+    engine = gameEngine;
+
+    // Cache DOM elements
+    moneyDisplay = document.getElementById('money-display');
+    popDisplay = document.getElementById('population-display');
+    dateDisplay = document.getElementById('date-display');
+    messageModal = document.getElementById('message-modal');
+    messageText = document.getElementById('message-text');
+    toolButtons = document.querySelectorAll('.tool-btn');
+
+    // Attach event listeners
+    toolButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentTool = btn.dataset.tool;
+            toolButtons.forEach(b => b.classList.remove('tool-active'));
+            btn.classList.add('tool-active');
+            
+            // Handle one-shot tools
+            if (currentTool === 'services' || currentTool === 'disasters' || currentTool === 'education') {
+                showMessage(`The ${currentTool} panel is not implemented yet.`);
+                // Reset to select tool
+                document.getElementById('tool-select').click();
+            }
+        });
+    });
+    
+    document.getElementById('save-button').addEventListener('click', () => engine.saveGame ? engine.saveGame() : showMessage('Save not implemented.'));
+    document.getElementById('load-button').addEventListener('click', () => engine.loadGame ? engine.loadGame() : showMessage('Load not implemented.'));
+    document.getElementById('new-game-button').addEventListener('click', ()_=> engine.newGame ? engine.newGame() : showMessage('New Game not implemented.'));
+
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.getElementById('tool-select').click();
+        }
+    });
+
+    // Initial UI update
+    updateVitals();
+}
+
+/**
+ * Main UI update loop, called every frame.
+ * (Currently only updates vitals once per tick)
+ */
+export function update(deltaTime) {
+    // We don't need to update vitals every frame,
+    // Simulation.tick() will call updateVitals() when state changes.
+}
+
+/**
+ * Updates the Vitals panel from the simulation state.
+ */
+export function updateVitals() {
+    const state = Simulation.getGameState();
+    moneyDisplay.textContent = Math.floor(state.money);
+    popDisplay.textContent = state.population;
+    dateDisplay.textContent = Simulation.getDateString();
+}
+
+/**
+ * Shows a message to the user.
+ */
+export function showMessage(text, duration = 2000) {
+    if (messageTimer) {
+        clearTimeout(messageTimer);
+    }
+    
+    messageText.textContent = text;
+    messageModal.classList.remove('hidden');
+    // Force reflow for transition
+    void messageModal.offsetWidth; 
+    messageModal.style.opacity = '1';
+    
+    messageTimer = setTimeout(() => {
+        messageModal.style.opacity = '0';
+        setTimeout(() => messageModal.classList.add('hidden'), 300);
+    }, duration);
+}
+
+export function getCurrentTool() {
+    return currentTool;
+}
