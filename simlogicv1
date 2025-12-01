@@ -1,0 +1,173 @@
+/**
+ * Simulation.js
+ * Handles the core game state, logic, and simulation ticks.
+ * No Three.js code should be in this file.
+ */
+
+const GRID_SIZE = 1000;
+const CELL_SIZE = 10;
+const HALF_GRID = GRID_SIZE / 2;
+
+// Core game state
+let gameState = {
+    money: 100000,
+    population: 0,
+    date: { month: 0, year: 1 },
+    objects: new Map() // Use a Map for easier key-based access: key -> object
+};
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// Costs
+const costs = {
+    road: 100,
+    residential: 50,
+    commercial: 50,
+    industrial: 50,
+    bulldoze: 10
+};
+
+let timeAccumulator = 0;
+const TICK_SPEED = 1.0; // 1 game second per real second
+
+export function init() {
+    console.log("Initializing Simulation...");
+    // Set up initial state if needed
+}
+
+/**
+ * The main simulation tick, called every frame.
+ * We accumulate delta time and run a fixed-step simulation (e.g., 1-second ticks)
+ */
+export function tick(deltaTime) {
+    timeAccumulator += deltaTime * TICK_SPEED;
+
+    // Run a simulation tick every 1 second
+    if (timeAccumulator >= 1.0) {
+        runGameTick();
+        timeAccumulator -= 1.0;
+    }
+}
+
+/**
+ * Runs a single 1-second game tick.
+ * This is where all simulation logic happens.
+ */
+function runGameTick() {
+    let population = 0;
+    let income = 0;
+
+    // --- Simulation Logic ---
+    // This is still simple, but we'll expand it.
+    
+    // 1. Calculate population
+    for (const obj of gameState.objects.values()) {
+        if (obj.type === 'residential') {
+            // Simple pop calculation: 5 people per residential zone
+            // TODO: Add "has power", "has water" checks
+            population += 5;
+        }
+    }
+    
+    // 2. Calculate income (Jobs)
+    for (const obj of gameState.objects.values()) {
+        if (obj.type === 'commercial') {
+            // Simple income: $10 per commercial zone
+            income += 10;
+        } else if (obj.type === 'industrial') {
+            // Simple income: $5 per industrial zone
+            income += 5;
+        }
+    }
+    
+    // 3. Update state
+    gameState.population = population;
+    gameState.money += income;
+    
+    // 4. Update date
+    gameState.date.month++;
+    if (gameState.date.month >= 12) {
+        gameState.date.month = 0;
+        gameState.date.year++;
+    }
+}
+
+// --- Public API ---
+
+export function placeObject(pos, type, cost) {
+    const key = getKey(pos);
+    if (gameState.objects.has(key)) {
+        return false; // Cell occupied
+    }
+    
+    // TODO: Add more placement rules (e.g., zones must be next to roads)
+    
+    const newObject = {
+        type: type,
+        x: pos.x,
+        z: pos.z,
+        // ... add more properties later (power, water, residents)
+    };
+    
+    gameState.objects.set(key, newObject);
+    gameState.money -= cost;
+    return true;
+}
+
+export function removeObject(pos, cost) {
+    const key = getKey(pos);
+    if (gameState.objects.has(key)) {
+        gameState.objects.delete(key);
+        gameState.money -= cost;
+        return true;
+    }
+    return false;
+}
+
+export function isOccupied(key) {
+    return gameState.objects.has(key);
+}
+
+export function getObjectAt(pos) {
+    const key = getKey(pos);
+    return gameState.objects.get(key);
+}
+
+export function canAfford(amount) {
+    return gameState.money >= amount;
+}
+
+export function getCost(type) {
+    return costs[type] || 0;
+}
+
+export function getGameState() {
+    return gameState;
+}
+
+export function getDateString() {
+    return `${MONTHS[gameState.date.month]}, Year ${gameState.date.year}`;
+}
+
+// --- Utility Functions ---
+
+/**
+ * Converts a 3D point to a grid-snapped position.
+ */
+export function getGridPosition(point) {
+    const x = Math.floor(point.x / CELL_SIZE) * CELL_SIZE + (CELL_SIZE / 2);
+    const z = Math.floor(point.z / CELL_SIZE) * CELL_SIZE + (CELL_SIZE / 2);
+    
+    // Bounds check
+    if (x < -HALF_GRID || x > HALF_GRID || z < -HALF_GRID || z > HALF_GRID) {
+        return null;
+    }
+    return { x, z };
+}
+
+/**
+ * Creates a unique string key from a position.
+ */
+export function getKey(pos) {
+    return `${pos.x},${pos.z}`;
+}
