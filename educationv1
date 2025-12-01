@@ -1,0 +1,27 @@
+/**
+ * Education.js
+ * STUB FILE
+ * This will manage the "Education Path" skill tree,
+ * city-wide education levels, and school services.
+ */
+
+let educationCredits = 0;
+let unlockedPaths = [];
+
+export function init() {
+    console.log("Initializing Education System (STUB)...");
+}
+
+export function addCredits(amount) {
+    educationCredits += amount;
+    console.log(`Gained ${amount} Education Credits. Total: ${educationCredits}`);
+}
+
+export function unlockPath(pathName) {
+    if (educationCredits > 0) { // Simple check
+        educationCredits--;
+        unlockedPaths.push(pathName);
+        console.log(`Unlocked Education Path: ${pathName}`);
+        // TODO: Apply global bonus
+    }
+}
